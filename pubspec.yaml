@@ -1,0 +1,35 @@
+name: calmspace
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_native_splash: ^2.4.4
+  shared_preferences: ^2.5.1
+  flutter_local_notifications: ^18.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/logo.jpeg  # Make sure the file exists
+
+flutter_native_splash:
+  color: "#ffffff"  # Background color (white)
+  image: assets/logo.jpeg  # Your app's logo (Ensure the filename matches)
+
+  android: true
+  ios: true
+  fullscreen: true
