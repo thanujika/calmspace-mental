@@ -22,11 +22,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --debug
+      - name: Build Flutter Web App
+        run: flutter build web --release
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
         with:
-          name: calmspace-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: flutter-web-build
+          path: build/web
+ 
