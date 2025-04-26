@@ -1,10 +1,20 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart'; // Import the generated file
+
 import 'screens/home_screen.dart';
 import 'screens/challenge_screen.dart';
 import 'screens/quick_calm_screen.dart';
 import 'screens/journal_screen.dart';
+import 'screens/login_screen.dart';  // Import Login Screen
+import 'screens/signup_screen.dart'; // Import SignUp Screen
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Firebase with the options specific to the current platform
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, // Make sure this points to the correct Firebase options for the platform
+  );
   runApp(CalmSpaceApp());
 }
 
@@ -15,25 +25,28 @@ class CalmSpaceApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'CalmSpace',
       theme: ThemeData(
-  primaryColor: Colors.blueAccent,
-  scaffoldBackgroundColor: Colors.white,
-  fontFamily: 'Poppins', // Make sure to add this font in pubspec.yaml
-  textTheme: TextTheme(
-   titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-bodyMedium: TextStyle(fontSize: 18, color: Colors.grey[700]),
-
-  ),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Colors.blueAccent,
-      foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-    ),
-  ),
-),
-
-      home: MainScreen(),
+        primaryColor: Colors.blueAccent,
+        scaffoldBackgroundColor: Colors.white,
+        fontFamily: 'Poppins', // Ensure this font is in pubspec.yaml
+        textTheme: TextTheme(
+          titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
+          bodyMedium: TextStyle(fontSize: 18, color: Colors.grey[700]),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueAccent,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+          ),
+        ),
+      ),
+      home: LoginScreen(), // Start with Login Screen
+      routes: {
+        '/login': (context) => LoginScreen(),
+        '/signup': (context) => SignUpScreen(),
+        '/home': (context) => MainScreen(),
+      },
     );
   }
 }

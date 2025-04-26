@@ -61,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
               ),
               SizedBox(height: 30),
-
+               //create 3 bottons   
               _buildFeatureCard(context, icon: Icons.self_improvement, label: "Quick Calm Techniques", color: Colors.teal.shade400, page: QuickCalmScreen()),
               _buildFeatureCard(context, icon: Icons.emoji_events, label: "Today's Challenge", color: Colors.green.shade400, page: ChallengeScreen()),
               _buildFeatureCard(context, icon: Icons.book, label: "Personal Journal", color: Colors.orange.shade300, page: JournalScreen()),
@@ -126,9 +126,9 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
+    
   Widget _buildFeatureCard(BuildContext context, {required IconData icon, required String label, required Color color, required Widget page}) {
-    return GestureDetector(
+    return GestureDetector( //screen navigation 
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) => page));
       },

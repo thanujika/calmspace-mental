@@ -1,5 +1,5 @@
  import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class JournalScreen extends StatefulWidget {
   @override
@@ -7,124 +7,133 @@ class JournalScreen extends StatefulWidget {
 }
 
 class _JournalScreenState extends State<JournalScreen> {
-  TextEditingController _controller = TextEditingController();
-  String? _savedEntry;
+  final TextEditingController _controller = TextEditingController();
+  List<Map<String, dynamic>> _journalEntries = [];
 
   @override
   void initState() {
     super.initState();
-    _loadJournalEntry();
+    _loadJournalEntries(); // Load entries when app opens
   }
 
-  Future<void> _loadJournalEntry() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  // Load all entries
+  Future<void> _loadJournalEntries() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('journals')
+        .orderBy('timestamp', descending: true)
+        .get();
+
     setState(() {
-      _savedEntry = prefs.getString('journal_entry') ?? '';
-      _controller.text = _savedEntry ?? '';
+      _journalEntries = snapshot.docs.map((doc) {
+        return {
+          'id': doc.id,
+          'entry': doc['entry'],
+          'timestamp': (doc['timestamp'] as Timestamp).toDate(),
+        };
+      }).toList();
     });
   }
 
+  // Save new entry
   Future<void> _saveJournalEntry() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('journal_entry', _controller.text);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Your journal entry has been saved!")));
+    if (_controller.text.trim().isEmpty) return;
+
+    DocumentReference docRef =
+        await FirebaseFirestore.instance.collection('journals').add({
+      'entry': _controller.text.trim(),
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+    setState(() {
+      _journalEntries.insert(0, {
+        'id': docRef.id,
+        'entry': _controller.text.trim(),
+        'timestamp': DateTime.now(),
+      });
+    });
+
+    _controller.clear();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Thought saved!")),
+    );
+  }
+
+  // Delete entry
+  Future<void> _deleteJournalEntry(String docId) async {
+    await FirebaseFirestore.instance.collection('journals').doc(docId).delete();
+
+    setState(() {
+      _journalEntries.removeWhere((entry) => entry['id'] == docId);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Thought deleted!")),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "📝 Personal Journal",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.teal.shade900),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.teal.shade900),
-          onPressed: () {
-            Navigator.pop(context); // Go back to the previous screen
-          },
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 2,
-        iconTheme: IconThemeData(color: Colors.teal.shade900),
+        title: Text("📝 My Thoughts Diary"),
+        backgroundColor: Colors.teal.shade900,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Title of the screen
-                Text(
-                  "Write Your Thoughts 📖",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.teal.shade900,
-                  ),
-                  textAlign: TextAlign.center,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Input box
+            TextField(
+              controller: _controller,
+              maxLines: 5,
+              decoration: InputDecoration(
+                hintText: "Write your thoughts here...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                SizedBox(height: 15),
-
-                // Introduction text
-                Text(
-                  "This is your personal space to reflect, relax, and track your journey. Write freely, it's your moment.",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey[700],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 25),
-
-                // TextField for journaling
-                TextField(
-                  controller: _controller,
-                  maxLines: 10,
-                  decoration: InputDecoration(
-                    hintText: "How are you feeling today? 🌸",
-                    hintStyle: TextStyle(color: Colors.grey[500]),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(color: Colors.purple.shade300, width: 2),
-                    ),
-                    filled: true,
-                    fillColor: Colors.purple.shade50,
-                  ),
-                ),
-                SizedBox(height: 25),
-
-                // Save Button
-                ElevatedButton(
-                  onPressed: _saveJournalEntry,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal.shade900,
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  child: Text(
-                    "Save My Thoughts 💭",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-                SizedBox(height: 25),
-
-                // Display saved journal entry or a message if there's none
-                Text(
-                  _savedEntry != null && _savedEntry!.isNotEmpty
-                      ? "Previous Entry: \n$_savedEntry"
-                      : "No previous entries. Start writing your thoughts!",
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+                fillColor: Colors.green.shade50,
+                filled: true,
+              ),
             ),
-          ),
+            SizedBox(height: 10),
+            // Save button
+            ElevatedButton(
+              onPressed: _saveJournalEntry,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal.shade900,
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 40),
+              ),
+              child: Text("Save", style: TextStyle(fontSize: 18)),
+            ),
+            SizedBox(height: 20),
+            // Show saved entries
+            Expanded(
+              child: _journalEntries.isEmpty
+                  ? Center(child: Text("No thoughts yet!"))
+                  : ListView.builder(
+                      itemCount: _journalEntries.length,
+                      itemBuilder: (context, index) {
+                        final entry = _journalEntries[index];
+                        final formattedDate =
+                            "${entry['timestamp'].year}-${entry['timestamp'].month}-${entry['timestamp'].day}";
+
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: ListTile(
+                            title: Text(entry['entry']),
+                            subtitle: Text("🕒 $formattedDate"),
+                            trailing: IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteJournalEntry(entry['id']),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );
