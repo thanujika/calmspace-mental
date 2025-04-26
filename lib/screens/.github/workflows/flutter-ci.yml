@@ -1,0 +1,34 @@
+name: Flutter Web CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.27.4' # Stable Flutter version
+
+      # Install dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Run Flutter tests
+      - name: Run tests
+        run: flutter test
+
+      # Build the Flutter web app
+      - name: Build Flutter Web
+        run: flutter build web
