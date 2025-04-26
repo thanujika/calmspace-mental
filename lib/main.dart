@@ -9,6 +9,8 @@ import 'screens/journal_screen.dart';
 import 'screens/login_screen.dart';  // Import Login Screen
 import 'screens/signup_screen.dart'; // Import SignUp Screen
 
+ 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase with the options specific to the current platform
@@ -89,4 +91,5 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
-}
+} //ppp  
+ 
