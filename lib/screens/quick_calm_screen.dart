@@ -7,60 +7,61 @@ class QuickCalmScreen extends StatefulWidget {
 }
 
 class _QuickCalmScreenState extends State<QuickCalmScreen> {
-  final List<Map<String, String>> techniques = [
+  // Update techniques list to store actual IconData
+  final List<Map<String, dynamic>> techniques = [
     {
       "title": "Deep Breathing 🌬️",
       "description": "Take deep breaths to calm your mind.",
-      "icon": "Icons.access_alarm",
+      "icon": Icons.access_alarm, // Use IconData here
     },
     {
       "title": "Soothing Sounds 🎶",
       "description": "Listen to relaxing sounds to destress.",
-      "icon": "Icons.music_note",
+      "icon": Icons.music_note,
     },
     {
       "title": "Mindfulness 🧘‍♀️",
       "description": "Practice mindfulness to center yourself.",
-      "icon": "Icons.self_improvement",
+      "icon": Icons.self_improvement,
     },
     {
       "title": "Nature Walk 🌿",
       "description": "Take a walk outside to connect with nature.",
-      "icon": "Icons.nature_people",
+      "icon": Icons.nature_people,
     },
     {
       "title": "Journaling ✍️",
       "description": "Write down your thoughts to clear your mind.",
-      "icon": "Icons.create",
+      "icon": Icons.create,
     },
     {
       "title": "Stretching 🧘‍♂️",
       "description": "Stretch your body to release tension.",
-      "icon": "Icons.fitness_center",
+      "icon": Icons.fitness_center,
     },
     {
       "title": "Gratitude Practice 🙏",
       "description": "Think of 3 things you're grateful for today.",
-      "icon": "Icons.favorite_border",
+      "icon": Icons.favorite_border,
     },
     {
       "title": "Visualization 🌟",
       "description": "Visualize your goals or happy moments.",
-      "icon": "Icons.visibility",
+      "icon": Icons.visibility,
     },
     {
       "title": "Progressive Relaxation 🌙",
       "description": "Relax your muscles one by one, starting from your toes.",
-      "icon": "Icons.local_hotel",
+      "icon": Icons.local_hotel,
     },
     {
       "title": "Positive Affirmations 💪",
       "description": "Speak out loud positive affirmations.",
-      "icon": "Icons.comment",
+      "icon": Icons.comment,
     },
   ];
 
-  late Map<String, String> _selectedTechnique;
+  late Map<String, dynamic> _selectedTechnique;
 
   @override
   void initState() {
@@ -166,6 +167,7 @@ class _QuickCalmScreenState extends State<QuickCalmScreen> {
     );
   }
 
+  // Updated method to build the technique card
   Widget _buildTechniqueCard() {
     return Container(
       padding: EdgeInsets.all(16),
@@ -184,7 +186,7 @@ class _QuickCalmScreenState extends State<QuickCalmScreen> {
       child: Column(
         children: [
           Icon(
-            IconData(0xe900, fontFamily: 'MaterialIcons'),
+            _selectedTechnique["icon"], // Directly use IconData
             size: 50,
             color: Colors.teal.shade500,
           ),
