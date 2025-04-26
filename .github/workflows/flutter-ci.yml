@@ -16,7 +16,10 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'  # Try 'stable' if version-specific isn't working
+          flutter-version: 'stable'
+
+      - name: Disable DevTools (skip unnecessary setups)
+        run: flutter config --no-enable-web-devtools
 
       - name: Install dependencies
         run: flutter pub get
